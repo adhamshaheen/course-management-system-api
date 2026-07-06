@@ -23,6 +23,16 @@ public class StudentServiceImpl implements IStudentService {
     // FIRST METHOD: Method to create a new student
     @Override
     public StudentDTO createStudent(StudentDTO dto) {
+
+        // Check if a student with the same email already exists
+        Student existingStudent = studentRepository.findByEmail(dto.getEmail());
+
+        // If a student with the same email exists, throw an exception to prevent duplicate entries
+        if (existingStudent != null) {
+            throw new RuntimeException("Student with email " + dto.getEmail() + " already exists");
+        }
+
+        // Create a new Student entity from the DTO and save it to the repository
         Student student = new Student(null, dto.getName(), dto.getEmail());
         Student saved = studentRepository.save(student);
         return mapToDTO(saved);

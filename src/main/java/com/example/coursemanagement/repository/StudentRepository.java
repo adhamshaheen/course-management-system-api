@@ -35,4 +35,14 @@ public class StudentRepository {
     public void delete(Long id) {
         students.remove(id);
     }
+
+    // Method to find a student by their email (it will be used for duplicate email check)
+    public Student findByEmail(String email) {
+    for (Student student : students.values()) {
+        if (student.getEmail().equals(email)) {
+            return student;
+        }
+    }
+    return null;
+}
 }
