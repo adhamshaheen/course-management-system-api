@@ -1,8 +1,10 @@
 package com.example.coursemanagement.repository;
 
 import com.example.coursemanagement.entity.Enrollment;
+import org.springframework.stereotype.Repository;
 import java.util.*;
-
+    
+@Repository
 public class EnrollmentRepository {
 
     // HashMap to store enrollments with the enrollment ID as the key
