@@ -13,6 +13,7 @@ public class Instructor {
     // Parameterized constructor
     public Instructor(Long id, String name, String specialization) {
         this.id = id;
+        this.name = name;
         this.specialization = specialization;
     }
 
