@@ -23,7 +23,7 @@ public class CourseServiceImpl implements ICourseService {
     // FIRST METHOD: Method to create a new course
     @Override
     public CourseDTO createCourse(CourseDTO courseDTO) {
-
+        
         Course course = new Course(
                 null,
                 courseDTO.getTitle(),
@@ -86,7 +86,16 @@ public class CourseServiceImpl implements ICourseService {
     // FIFTH METHOD: Method to delete a course by its ID
     @Override
     public void deleteCourse(Long id) {
-        courseRepository.delete(id);
+
+        Course course = courseRepository.findById(id);
+
+        if (course == null) {
+            throw new RuntimeException("Course not found with id: " + id);
+        }
+
+        // Soft delete: Mark the course as deleted instead of removing it from the repository
+        course.setDeleted(true);
+        courseRepository.save(course);
     }
 
     // HELPER METHOD: Method to map Course entity to CourseDTO

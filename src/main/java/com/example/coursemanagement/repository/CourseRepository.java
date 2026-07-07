@@ -26,11 +26,18 @@ public class CourseRepository {
         return courses.get(id);
     }
 
-    // Method to retrieve all courses
+    // Method to retrieve all ACTIVE courses (not deleted)
     public List<Course> findAll() {
-        return new ArrayList<>(courses.values());
-    }
+        List<Course> activeCourses = new ArrayList<>();
 
+        for (Course course : courses.values()) {
+        if (!course.isDeleted()) {
+            activeCourses.add(course);
+        }
+    }
+        return activeCourses;
+    }
+    
     // Method to delete a course by its ID
     public void delete(Long id) {
         courses.remove(id);

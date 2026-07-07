@@ -7,6 +7,8 @@ public class Course {
     private String title;
     private String description;
     private Long instructorId;
+    // Flag to indicate if the course is deleted (soft delete)
+    private boolean deleted = false;
 
     // Default constructor
     public Course() {}
@@ -50,5 +52,13 @@ public class Course {
 
     public void setInstructorId(Long instructorId) {
         this.instructorId = instructorId;
+    }
+
+    public boolean isDeleted() {
+        return deleted;
+    }
+
+    public void setDeleted(boolean deleted) {
+        this.deleted = deleted;
     }
 }
