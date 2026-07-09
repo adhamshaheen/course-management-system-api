@@ -38,20 +38,60 @@ public class StudentServiceImpl implements IStudentService {
         return mapToDTO(saved);
     }
 
-    // SECOND METHOD: Method to retrieve all students
+    // SECOND METHOD: Method to retrieve students with pagination and sorting
     @Override
-    public List<StudentDTO> getAllStudents() {
+    public List<StudentDTO> getStudents(int page, int size, String sortBy) {
 
+        // Get all students from the repository
         List<Student> students = studentRepository.findAll();
-        List<StudentDTO> studentDTOs = new ArrayList<>();
 
-        // Map each Student entity to a StudentDTO and add it to the list
-        for (Student student : students) {
-            StudentDTO studentDTO = mapToDTO(student);
-            studentDTOs.add(studentDTO);
+        // Sort the students
+        if (sortBy.equalsIgnoreCase("name")) {
+
+            students.sort(
+                    (student1, student2) ->
+                            student1.getName().compareToIgnoreCase(student2.getName())
+            );
+
+        } else if (sortBy.equalsIgnoreCase("email")) {
+
+            students.sort(
+                    (student1, student2) ->
+                            student1.getEmail().compareToIgnoreCase(student2.getEmail())
+            );
+
+        } else {
+
+            // Default sorting by ID
+            students.sort(
+                    (student1, student2) ->
+                            student1.getId().compareTo(student2.getId())
+            );
         }
 
-        return studentDTOs;
+        // Calculate the start and end index for pagination
+        int startIndex = page * size;
+        int endIndex = Math.min(startIndex + size, students.size());
+
+        // If the requested page exceeds the number of students, return an empty list
+        if (startIndex >= students.size()) {
+            return new ArrayList<>();
+        }
+
+        // Get only the required page of students
+        List<Student> pagedStudents = students.subList(startIndex, endIndex);
+
+        // Convert Student objects to StudentDTO objects
+        List<StudentDTO> studentDTOList = new ArrayList<>();
+
+        for (Student student : pagedStudents) {
+
+            StudentDTO studentDTO = mapToDTO(student);
+
+            studentDTOList.add(studentDTO);
+        }
+
+        return studentDTOList;
     }
 
     // THIRD METHOD: Method to retrieve a student by their ID

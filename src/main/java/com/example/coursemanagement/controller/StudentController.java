@@ -28,8 +28,17 @@ public class StudentController {
     // SECOND METHOD: Endpoint to retrieve all students
     // Route: GET /api/students
     @GetMapping
-    public List<StudentDTO> getAllStudents() {
-        return studentService.getAllStudents();
+    public List<StudentDTO> getStudents(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "5") int size,
+            @RequestParam(defaultValue = "id") String sortBy
+    ) {
+
+        return studentService.getStudents(
+                page,
+                size,
+                sortBy
+        );
     }
 
     // THIRD METHOD: Endpoint to retrieve a student by their ID

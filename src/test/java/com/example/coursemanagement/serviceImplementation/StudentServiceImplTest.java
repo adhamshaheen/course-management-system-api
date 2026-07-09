@@ -114,7 +114,7 @@ public class StudentServiceImplTest {
 
 
         // 2- Act (Invoke the method under test to retrieve all students)
-        List<StudentDTO> result = studentService.getAllStudents();
+        List<StudentDTO> result = studentService.getStudents(0, 5, "id");
 
 
         // 3- Assert (Check that the result is not null, has the expected size, and contains the expected student data)
@@ -123,6 +123,74 @@ public class StudentServiceImplTest {
         assertEquals(student.getId(), result.get(0).getId());
         assertEquals(student.getName(), result.get(0).getName());
         assertEquals(student.getEmail(), result.get(0).getEmail());
+
+        // 4- Verify (Verify that the repository's findAll method was called)
+        verify(studentRepository).findAll();
+    }
+
+    @Test
+    // Test method to verify that an empty list is returned when the requested page does not exist
+    void getStudents_ShouldReturnEmptyList_WhenPageIsOutOfRange() {
+
+        // 1- Arrange (Create a list containing one student and mock the repository)
+        List<Student> students = new ArrayList<>();
+        students.add(student);
+
+        when(studentRepository.findAll()).thenReturn(students);
+
+        // 2- Act (Request a page that does not exist)
+        List<StudentDTO> result = studentService.getStudents(5, 5, "id");
+
+
+        // 3- Assert (Verify that the returned list is empty)
+        assertNotNull(result);
+        assertTrue(result.isEmpty());
+
+
+        // 4- Verify (Verify that the repository's findAll method was called)
+        verify(studentRepository).findAll();
+    }
+
+    @Test
+    // Test method to verify that students are sorted by name successfully
+    void getStudents_ShouldSortStudentsByNameSuccessfully() {
+
+        // 1- Arrange (Create students in an unsorted order)
+        Student student1 = new Student(1L, "Mohamed", "mohamed@test.com");
+
+        Student student2 = new Student(2L, "Ahmed", "ahmed@test.com");
+
+        Student student3 = new Student(3L, "Youssef", "youssef@test.com");
+
+        List<Student> students = new ArrayList<>();
+        students.add(student1);
+        students.add(student2);
+        students.add(student3);
+
+        when(studentRepository.findAll()).thenReturn(students);
+
+        // 2- Act (Retrieve students sorted by name)
+        List<StudentDTO> result = studentService.getStudents(0, 10, "name");
+
+        // 3- Assert (Verify that students are sorted alphabetically)
+        assertNotNull(result);
+        assertEquals(3, result.size());
+
+        assertEquals(
+                "Ahmed",
+                result.get(0).getName()
+        );
+
+        assertEquals(
+                "Mohamed",
+                result.get(1).getName()
+        );
+
+        assertEquals(
+                "Youssef",
+                result.get(2).getName()
+        );
+
 
         // 4- Verify (Verify that the repository's findAll method was called)
         verify(studentRepository).findAll();

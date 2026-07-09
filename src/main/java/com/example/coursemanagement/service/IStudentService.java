@@ -9,7 +9,7 @@ public interface IStudentService {
     StudentDTO createStudent(StudentDTO studentDTO);
 
     // 2- Method to retrieve all students
-    List<StudentDTO> getAllStudents();
+    List<StudentDTO> getStudents(int page, int size, String sortBy);
 
     // 3- Method to retrieve a student by their ID
     StudentDTO getStudentById(Long id);
