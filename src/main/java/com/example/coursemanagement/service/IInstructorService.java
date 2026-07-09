@@ -9,7 +9,7 @@ public interface IInstructorService {
     InstructorDTO createInstructor(InstructorDTO instructorDTO);
 
     // 2- Method to retrieve all instructors
-    List<InstructorDTO> getAllInstructors();
+    List<InstructorDTO> getInstructors(int page, int size, String sortBy);
 
     // 3- Method to retrieve an instructor by their ID
     InstructorDTO getInstructorById(Long id);

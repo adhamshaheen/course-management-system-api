@@ -28,8 +28,13 @@ public class InstructorController {
     // SECOND METHOD: Endpoint to retrieve all instructors
     // Route: GET /api/instructors
     @GetMapping
-    public List<InstructorDTO> getAllInstructors() {
-        return instructorService.getAllInstructors();
+    public List<InstructorDTO> getInstructors(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "5") int size,
+            @RequestParam(defaultValue = "id") String sortBy
+    ) {
+
+        return instructorService.getInstructors(page, size, sortBy);
     }
 
     // THIRD METHOD: Endpoint to retrieve an instructor by their ID

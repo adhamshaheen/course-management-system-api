@@ -35,16 +35,54 @@ public class InstructorServiceImpl implements IInstructorService {
         return mapToDTO(savedInstructor);
     }
 
-    // SECOND METHOD: Method to retrieve all instructors
+    // SECOND METHOD: Method to retrieve instructors with pagination and sorting
     @Override
-    public List<InstructorDTO> getAllInstructors() {
+    public List<InstructorDTO> getInstructors(int page, int size, String sortBy) {
 
         List<Instructor> instructors = instructorRepository.findAll();
+
+        if (sortBy.equalsIgnoreCase("name")) {
+
+            instructors.sort(
+                    (instructor1, instructor2) ->
+                            instructor1.getName().compareToIgnoreCase(instructor2.getName())
+            );
+
+        } else if (sortBy.equalsIgnoreCase("specialization")) {
+
+            instructors.sort(
+                    (instructor1, instructor2) ->
+                            instructor1.getSpecialization().compareToIgnoreCase(
+                                    instructor2.getSpecialization()
+                            )
+            );
+
+        } else {
+
+            instructors.sort(
+                    (instructor1, instructor2) ->
+                            instructor1.getId().compareTo(instructor2.getId())
+            );
+        }
+
+        if (page < 0 || size <= 0) {
+            throw new RuntimeException("Page number and page size must be greater than zero");
+        }
+
+        int startIndex = page * size;
+        int endIndex = Math.min(startIndex + size, instructors.size());
+
+        if (startIndex >= instructors.size()) {
+            return new ArrayList<>();
+        }
+
+        List<Instructor> pagedInstructors =
+                instructors.subList(startIndex, endIndex);
+
         List<InstructorDTO> instructorDTOList = new ArrayList<>();
 
-        for (Instructor instructor : instructors) {
-            InstructorDTO instructorDTO = mapToDTO(instructor);
-            instructorDTOList.add(instructorDTO);
+        for (Instructor instructor : pagedInstructors) {
+            instructorDTOList.add(mapToDTO(instructor));
         }
 
         return instructorDTOList;

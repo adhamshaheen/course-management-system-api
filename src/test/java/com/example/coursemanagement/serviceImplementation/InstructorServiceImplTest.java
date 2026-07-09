@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(org.mockito.junit.jupiter.MockitoExtension.class)
@@ -76,7 +77,7 @@ public class InstructorServiceImplTest {
 
     @Test
     // Method to test the successful retrieval of all instructors
-    void getAllInstructors_ShouldReturnAllInstructorsSuccessfully() {
+    void getAllInstructors_ShouldReturnInstructorsSuccessfully() {
 
         // 1- Arrange
         List<Instructor> instructors = new ArrayList<>();
@@ -87,7 +88,7 @@ public class InstructorServiceImplTest {
 
         // 2- Act
         List<InstructorDTO> result =
-                instructorService.getAllInstructors();
+                instructorService.getInstructors(0, 5, "id");
 
         // 3- Assert
         assertNotNull(result);
@@ -98,6 +99,66 @@ public class InstructorServiceImplTest {
                 instructor.getSpecialization(),
                 result.get(0).getSpecialization()
         );
+
+        // 4- Verify (Verify that the findAll method of the repository was called)
+        verify(instructorRepository).findAll();
+
+    }
+
+    @Test
+    // Method to test retrieving instructors when the requested page is out of range
+    void getInstructors_ShouldReturnEmptyList_WhenPageIsOutOfRange() {
+
+        // 1- Arrange (Create a list of instructors and mock the repository to return it)
+        List<Instructor> instructors = new ArrayList<>();
+        instructors.add(instructor);
+
+        when(instructorRepository.findAll()).thenReturn(instructors);
+
+        // 2- Act (Request a page that does not exist)
+        List<InstructorDTO> result = instructorService.getInstructors(5, 5, "id");
+
+        // 3- Assert (Verify that an empty list is returned because the page is out of range)
+        assertNotNull(result);
+        assertEquals(0, result.size());
+
+        // 4- Verify (Verify that the findAll method of the repository was called)
+        verify(instructorRepository).findAll();
+
+    }
+
+    @Test
+    // Method to test that instructors are sorted successfully by their names
+    void getInstructors_ShouldSortInstructorsByNameSuccessfully() {
+
+        // 1- Arrange (Create multiple instructors with different names)
+        Instructor firstInstructor = new Instructor(
+                1L,
+                "Ahmed",
+                "Backend Development"
+        );
+
+        Instructor secondInstructor = new Instructor(
+                2L,
+                "Mohamed",
+                "Artificial Intelligence"
+        );
+
+        List<Instructor> instructors = new ArrayList<>();
+        instructors.add(secondInstructor);
+        instructors.add(firstInstructor);
+
+        // Mock the repository to return the instructors list
+        when(instructorRepository.findAll()).thenReturn(instructors);
+
+        // 2- Act (Retrieve instructors sorted by name)
+        List<InstructorDTO> result = instructorService.getInstructors(0, 5, "name");
+
+        // 3- Assert (Verify that instructors are sorted alphabetically by name)
+        assertNotNull(result);
+        assertEquals(2, result.size());
+        assertEquals("Ahmed", result.get(0).getName());
+        assertEquals("Mohamed", result.get(1).getName());
 
         // 4- Verify (Verify that the findAll method of the repository was called)
         verify(instructorRepository).findAll();
