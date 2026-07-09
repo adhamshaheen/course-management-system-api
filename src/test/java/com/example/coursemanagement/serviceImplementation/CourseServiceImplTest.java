@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(org.mockito.junit.jupiter.MockitoExtension.class)
@@ -35,9 +36,6 @@ public class CourseServiceImplTest {
     // Method to set up test data before each test case
     @BeforeEach
     void setUp() {
-
-        MockitoAnnotations.openMocks(this);
-
 
         course = new Course(
                 1L,
@@ -82,7 +80,7 @@ public class CourseServiceImplTest {
 
     @Test
     // Method to test the successful retrieval of all courses
-    void getAllCourses_ShouldReturnAllCoursesSuccessfully() {
+    void getAllCourses_ShouldReturnCoursesSuccessfully() {
 
         // 1- Arrange
         List<Course> courses = new ArrayList<>();
@@ -93,7 +91,7 @@ public class CourseServiceImplTest {
                 .thenReturn(courses);
 
         // 2- Act (Invoke the getAllCourses method of the service)
-        List<CourseDTO> result = courseService.getAllCourses();
+        List<CourseDTO> result = courseService.getCourses(0, 5, "id");
 
         // 3- Assert (Verify that the result is not null, has the expected size, and that the fields of the first course match the expected values)
         assertNotNull(result);
@@ -106,6 +104,72 @@ public class CourseServiceImplTest {
         // 4- Verify (Verify that the findAll method of the repository was called)
         verify(courseRepository).findAll();
 
+    }
+
+    @Test
+    // Method to test that an empty list is returned when the requested page does not exist
+    void getCourses_ShouldReturnEmptyList_WhenPageIsOutOfRange() {
+
+        // 1- Arrange
+        List<Course> courses = new ArrayList<>();
+        courses.add(course);
+
+        when(courseRepository.findAll()).thenReturn(courses);
+
+        // 2- Act
+        List<CourseDTO> result = courseService.getCourses(5, 5, "id");
+
+        // 3- Assert
+        assertNotNull(result);
+        assertTrue(result.isEmpty());
+
+        // 4- Verify
+        verify(courseRepository).findAll();
+    }
+
+    @Test
+    // Method to test that courses are sorted by title successfully
+    void getCourses_ShouldSortCoursesByTitleSuccessfully() {
+
+        // 1- Arrange
+        Course course1 = new Course(
+                1L,
+                "Spring Boot",
+                "Description",
+                1L
+        );
+
+        Course course2 = new Course(
+                2L,
+                "Algorithms",
+                "Description",
+                1L
+        );
+
+        Course course3 = new Course(
+                3L,
+                "Databases",
+                "Description",
+                1L
+        );
+
+        List<Course> courses = new ArrayList<>();
+        courses.add(course1);
+        courses.add(course2);
+        courses.add(course3);
+
+        when(courseRepository.findAll()).thenReturn(courses);
+
+        // 2- Act
+        List<CourseDTO> result = courseService.getCourses(0, 10, "title");
+
+        // 3- Assert
+        assertEquals("Algorithms", result.get(0).getTitle());
+        assertEquals("Databases", result.get(1).getTitle());
+        assertEquals("Spring Boot", result.get(2).getTitle());
+
+        // 4- Verify
+        verify(courseRepository).findAll();
     }
 
     @Test

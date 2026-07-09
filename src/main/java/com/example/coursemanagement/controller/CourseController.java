@@ -25,11 +25,16 @@ public class CourseController {
         return courseService.createCourse(courseDTO);
     }
 
-    // SECOND METHOD: Endpoint to retrieve all courses
+    // SECOND METHOD: Endpoint to retrieve all courses with pagination and sorting
     // Route: GET /api/courses
     @GetMapping
-    public List<CourseDTO> getAllCourses() {
-        return courseService.getAllCourses();
+    public List<CourseDTO> getCourses(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "5") int size,
+            @RequestParam(defaultValue = "id") String sortBy
+    ) {
+
+        return courseService.getCourses(page, size,sortBy);
     }
 
     // THIRD METHOD: Endpoint to retrieve a course by its ID

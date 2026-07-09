@@ -36,16 +36,51 @@ public class CourseServiceImpl implements ICourseService {
         return mapToDTO(savedCourse);
     }
 
-    // SECOND METHOD: Method to retrieve all courses
+    // SECOND METHOD: Method to retrieve courses with pagination and sorting
     @Override
-    public List<CourseDTO> getAllCourses() {
+    public List<CourseDTO> getCourses(int page, int size, String sortBy) {
 
+        // Get all courses from the repository
         List<Course> courses = courseRepository.findAll();
+
+        // Sort the courses
+        if (sortBy.equalsIgnoreCase("title")) 
+        {
+
+            courses.sort(
+                    (course1, course2) ->
+                            course1.getTitle().compareToIgnoreCase(course2.getTitle())
+            );
+
+        } 
+        else 
+        {
+            // Default sorting by ID
+            courses.sort(
+                    (course1, course2) ->
+                            course1.getId().compareTo(course2.getId())
+            );
+        }
+
+        // Validate page and size
+        if (page < 0 || size <= 0) {
+            throw new RuntimeException("Page number and page size must be greater than zero");
+        }
+
+        // Calculate pagination
+        int startIndex = page * size;
+        int endIndex = Math.min(startIndex + size, courses.size());
+
+        if (startIndex >= courses.size()) {
+            return new ArrayList<>();
+        }
+
+        List<Course> pagedCourses = courses.subList(startIndex, endIndex);
+
         List<CourseDTO> courseDTOList = new ArrayList<>();
 
-        for (Course course : courses) {
-            CourseDTO courseDTO = mapToDTO(course);
-            courseDTOList.add(courseDTO);
+        for (Course course : pagedCourses) {
+            courseDTOList.add(mapToDTO(course));
         }
 
         return courseDTOList;

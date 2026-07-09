@@ -9,7 +9,7 @@ public interface ICourseService {
     CourseDTO createCourse(CourseDTO courseDTO);
 
     // 2- Method to retrieve all courses
-    List<CourseDTO> getAllCourses();
+    List<CourseDTO> getCourses(int page, int size, String sortBy);
 
     // 3- Method to retrieve a course by its ID
     CourseDTO getCourseById(Long id);
